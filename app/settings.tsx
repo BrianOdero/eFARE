@@ -31,7 +31,7 @@ export default function Settings() {
     <TouchableOpacity key={index} style={[styles.settingsItem, !isLast && styles.settingsItemBorder]} onPress={() => router.push(item.link as any)}>
 
       <View style={styles.settingsItemContent}>
-        <Icon name={item.icon as any} size={24} color="black" style={styles.settingsItemIcon} />
+        <Icon name={item.icon as any} size={24} color="blue" style={styles.settingsItemIcon} />
         <Text style={styles.settingsItemLabel}>{item.label}</Text>
       </View>
 

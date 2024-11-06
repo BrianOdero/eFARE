@@ -19,6 +19,11 @@ export default function Index() {
   return (
     <SafeAreaView style={styles.safeArea}>
 
+      <View style={styles.welcomeSec}>
+        <Text style={styles.welcomeSecHeader}>WELCOME TO EPAY</Text>
+        <Text style={styles.welcomeSecText}>Your one time digital fare payment solution</Text>
+      </View>
+
 
       <View style={styles.container}>
         <Text style={styles.title}>PAYMENT OPTIONS</Text>
@@ -27,7 +32,7 @@ export default function Index() {
           renderItem={({item}) => (
             <Link href={item.link as any} asChild>
               <TouchableOpacity style={styles.paymentOption}>
-                <Ionicons name={item.icon as any} size={28} color="black" />
+                <Ionicons name={item.icon as any} size={28} color="blue" />
                 <Text style={styles.optionText}>{item.title}</Text>
               </TouchableOpacity>
             </Link>
@@ -40,6 +45,23 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
+  welcomeSec: {
+    height: 180,
+    backgroundColor: "blue",
+    marginTop: 30,
+    borderBottomRightRadius: 30,
+    borderTopLeftRadius: 30
+  },
+  welcomeSecHeader: {
+    color: "white",
+    fontWeight: "bold",
+    margin: 20,
+    fontSize: 24
+  },
+  welcomeSecText: {
+    color: "white",
+    margin: 20
+  },
   safeArea: {
     flex: 1,
     backgroundColor: '#f0f0f0',
