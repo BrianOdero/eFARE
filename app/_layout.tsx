@@ -16,6 +16,9 @@ export default function RootLayout() {
       tabBarIcon: ({size,color}) => (<Ionicons name="settings" size={size} color={color}/>),
       title: "Settings"
     }}/>
+    <Tabs.Screen name="(home)" options={{
+      href: null,
+    }}/>
    </Tabs>
   );
 }
