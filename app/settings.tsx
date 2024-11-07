@@ -11,7 +11,6 @@ export default function Settings() {
   const settingsItems = [
     { section: 'GENERAL', items: [
       { icon: 'person-outline', label: 'Account', link: "/(settings)/account" },
-      { icon: 'notifications-outline', label: 'Notifications' },
       { icon: 'trash-outline', label: 'Delete account' },
     ]},
     { section: 'FEEDBACK', items: [
