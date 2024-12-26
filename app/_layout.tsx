@@ -1,9 +1,14 @@
+import { ClerkLoaded, ClerkProvider } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, Tabs } from "expo-router";
 
 export default function RootLayout() {
+
+
+
   return (
-   <Tabs screenOptions={{headerShown: false}}>
+   
+    <Tabs screenOptions={{headerShown: false}}>
     <Tabs.Screen name="index" options={{
       tabBarIcon: ({size,color}) => (<Ionicons size={size} color={color} name="home"/>),
       title: "Home"
@@ -20,5 +25,7 @@ export default function RootLayout() {
       href: null,
     }}/>
    </Tabs>
+    
   );
 }
+
