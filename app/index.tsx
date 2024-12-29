@@ -1,3 +1,4 @@
+import supabase from "@/DBconfig/supabaseClient";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 
@@ -17,11 +18,8 @@ export default function Index() {
  
 
 
-  const pages = [
-    {id: 1, title: "STK push payment", icon: "wallet", link: "/(home)/stkpush"},
-    {id: 2, title: "QR code payment", icon: "qr-code", link: "/(home)/qrcode"},
-    {id: 3, title: "Customer refunds", icon: "refresh", link: "/(home)/refunds"},
-  ]
+
+   
 
   const getAccessToken = async () => {
     try {
@@ -38,37 +36,74 @@ export default function Index() {
   }
 
   const handleSendSTKpush = async () => {
-    
-    let headers = new Headers();
-    headers.append("Content-Type", "application/json");
-    headers.append("Authorization", `Bearer ${await getAccessToken()}`);
-    
-    fetch("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
+    try {
+      // Create headers
+      let headers = new Headers();
+      headers.append("Content-Type", "application/json");
+      headers.append("Authorization", `Bearer ${await getAccessToken()}`);
+  
+      // Prepare the request body
+      const timestamp = new Date().toISOString().replace(/[^0-9]/g, '').slice(0, -3);
+      const password = btoa(
+        "174379" +
+        "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919" +
+        timestamp
+      );
+  
+      const requestBody = {
         "BusinessShortCode": 174379,
-        "Password": btoa("174379" + "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919" + new Date().toISOString().replace(/[^0-9]/g, '').slice(0, -3)),
-        "Timestamp": new Date().toISOString().replace(/[^0-9]/g, '').slice(0, -3),
-        "TransactionType": "CustomerPayBillOnline", 
+        "Password": password,
+        "Timestamp": timestamp,
+        "TransactionType": "CustomerPayBillOnline",
         "Amount": amount,
         "PartyA": phoneNumber,
-    "PartyB": paybill,
-    "PhoneNumber": phoneNumber,
-    "CallBackURL": "https://mydomain.com/path",
+        "PartyB": paybill,
+        "PhoneNumber": phoneNumber,
+        "CallBackURL": "https://mydomain.com/path",
         "AccountReference": "BusCar CompanyXLTD",
-        "TransactionDesc": "Payment of Bus Fare" 
-      })
-    })
-    .then(response => response.text())
-    .then(result => console.log(result))
-    .catch(error => console.log(error));
-    alert("STK push sent successfully.Please check your phone for confirmation");
-    setPhoneNumber("");
-    setAmount("");
-    setPaybill("");
-  }
-
+        "TransactionDesc": "Payment of Bus Fare"
+      };
+  
+      // Make the API call
+      const response = await fetch("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(requestBody)
+      });
+  
+      const result = await response.json();
+      console.log(result);
+  
+      // Push data to Supabase after initiating STK push
+      const { data, error } = await supabase
+        .from('records')
+        .insert([
+          {
+            phone_number: phoneNumber,
+            amount: amount,
+            payment_status: 'PENDING'
+          }
+        ]);
+  
+      if (error) {
+        console.error("Error inserting data into Supabase:", error);
+        alert("STK push sent but failed to save data to the database.");
+      } else {
+        console.log("Data saved to Supabase:", data);
+        alert("STK push sent successfully. Please check your phone for confirmation.");
+      }
+  
+      // Reset the input fields
+      setPhoneNumber("");
+      setAmount("");
+      setPaybill("");
+    } catch (error) {
+      console.error("Error sending STK push:", error);
+      alert("An error occurred while sending the STK push. Please try again.");
+    }
+  };
+  
+  
    const AnimatedText = useAnimatedStyle(() => {
       return {
         fontSize: 16,
@@ -81,12 +116,12 @@ export default function Index() {
     <SafeAreaView style={styles.safeArea}>
 
       <View style={styles.welcomeSec}>
-        <Text style={styles.welcomeSecHeader}>WELCOME TO EPAY</Text>
+        <Text style={styles.welcomeSecHeader}>WELCOME TO e-FARE</Text>
         <Text style={styles.welcomeSecText}>Your one time digital fare payment solution</Text>
       </View>
 
       <Animated.View style={styles.container} entering={FadeIn} exiting={FadeOut}>
-            <Animated.Text entering={FadeInLeft.duration(500)} exiting={FadeOutLeft.duration(500)} style={AnimatedText} >Please Enter The Phone Number Of Recepient Receiving STK push</Animated.Text>
+            <Animated.Text entering={FadeInLeft.duration(500)} exiting={FadeOutLeft.duration(500)} style={AnimatedText} >Enter The Number Receiving STK push</Animated.Text>
             <TextInput 
               style={styles.input}
               value={phoneNumber}
@@ -129,8 +164,8 @@ const styles = StyleSheet.create({
     height: 200,
     backgroundColor: "blue",
     marginTop: 30,
-    borderBottomRightRadius: 40,
-    borderTopLeftRadius: 40
+    borderBottomRightRadius: 20,
+    borderTopLeftRadius: 20
   },
   welcomeSecHeader: {
     color: "white",
